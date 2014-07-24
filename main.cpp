@@ -5,8 +5,8 @@ using namespace std;
 
 int main() {
     solve sol;
-    char p[] = "top50000.txt";
+    char p[] = "tarek_pearly_6000.txt";
     ifstream puzzles(p);
-    sol.solve_puzzle(puzzles);
+    sol.solve_puzzle(puzzles, true);
 }
 

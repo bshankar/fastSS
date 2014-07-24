@@ -8,9 +8,11 @@ QMAKE_CXXFLAGS += -std=c++11 \
 
 SOURCES += main.cpp \
     matrix.cpp \
-    solve.cpp
+    solve.cpp \
+    generate.cpp
 
 HEADERS += \
     matrix.h \
-    solve.h
+    solve.h \
+    generate.h
 

@@ -1,7 +1,6 @@
 #include "solve.h"
 #include "matrix.h"
 #include <iostream>
-#include <vector>
 
 typedef unsigned short  us;
 typedef unsigned int ui;
@@ -9,7 +8,6 @@ typedef unsigned long ul;
 
 using std::cout;
 using std::endl;
-using std::vector;
 using std::ifstream;
 
 struct solve::solve_vars {
@@ -31,7 +29,7 @@ struct solve::solve_vars {
     node    solution[INFTY];
     char    solution_str[81]; // To be printed
     us      solutions;
-    std::vector<us> covered_colns;  // store the order in which colns are covered.
+      // store the order in which colns are covered.
 };
 
 solve::solve()
@@ -135,14 +133,10 @@ void solve::cover(node c) {
             j->coln->size--;
         }
     }
-    sV->covered_colns.push_back(c->name);
 }
 
-void solve::uncover(node c) {
 
-    // Prevent anomalous uncovering
-    if (c->name != sV->covered_colns.back())
-        return;
+void solve::uncover(node c) {
 
     for (node  i = c->up; i != c; i = i->up) {
         for (node  j = i->left; j != i; j = j->left) {
@@ -154,10 +148,6 @@ void solve::uncover(node c) {
 
     c->left->right = c;
     c->right->left = c;
-    // assuming uncovering takes place
-    // in the exact opposite order
-    // Decent assumption for expected behavior
-    sV->covered_colns.pop_back();
 }
 
 
@@ -230,6 +220,8 @@ void solve::print_solution() {
 
 void solve::cover_colns(char *puzzle) {
 
+    cc_index = 0;
+
     for (us cell = 0; cell < CELLS; ++cell) {
 
         if (puzzle[cell] != '0') {
@@ -245,18 +237,24 @@ void solve::cover_colns(char *puzzle) {
             cover(sV->coln_headers[c2]);
             cover(sV->coln_headers[c3]);
             cover(sV->coln_headers[c4]);
-
             sV->solution_str[cell] = puzzle[cell];
+
+            covered_colns[cc_index]   = c1;
+            covered_colns[++cc_index] = c2;
+            covered_colns[++cc_index] = c3;
+            covered_colns[++cc_index] = c4;
+            cc_index += 1;
         }
     }
 }
 
 
 void solve::restore_colns() {
-    while (!sV->covered_colns.empty())
-        uncover(sV->coln_headers[sV->covered_colns.back()]);
-        if (sV->covered_colns.size() > 1)
-            sV->covered_colns.pop_back();
+    for (int i = cc_index - 1; i >= 0; --i) {
+        uncover(sV->coln_headers[covered_colns[i]]);
+        covered_colns[i] = 0;
+    }
+    cc_index = 0;
     sV->solutions = 0;
 }
 

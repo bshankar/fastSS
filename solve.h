@@ -38,11 +38,15 @@ public:
     void solve_puzzle(char* );
     void solve_puzzle(std::ifstream& , bool quiet=true);
 
-
+protected:
+    us cc_index = 0;
+    us covered_colns[COLNS] = {};
 
 private:
     struct solve_vars;
     solve_vars *sV;
+
+
 };
 
 #endif // SOLVE_H

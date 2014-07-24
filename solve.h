@@ -24,7 +24,6 @@ class solve : public matrix{
 
 public:
     explicit solve();
-
     void init_dlx();
     void choose_coln();
     void cover(node );

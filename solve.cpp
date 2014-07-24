@@ -37,6 +37,7 @@ solve::solve()
     init_dlx();
 }
 
+
 void solve::init_dlx() {
     sV->root      = new link();
     sV->this_head = new link();
@@ -107,43 +108,71 @@ void solve::init_dlx() {
     }
 }
 
-void solve::choose_coln() {
+inline void solve::choose_coln() {
 
     // Minimize branching
     sV->min_coln = sV->root->right;
     sV->min_size = sV->root->right->size;
     for (node cH = sV->root->right; cH != sV->root; cH = cH->right) {
 
-        if (cH->size < sV->min_size and cH->size > 0) {
+        if (cH->size == 1) {
+            sV->min_size = 1;
+            sV->min_coln = cH;
+            break;
+        }
+
+        if (cH->size < sV->min_size) {
             sV->min_coln = cH;
             sV->min_size = cH->size;
         }
     }
 }
 
-void solve::cover(node c) {
+inline void solve::cover(node c) {
 
     c->left->right = c->right;
     c->right->left = c->left;
 
     for (node  i = c->down; i != c; i = i->down) {
-        for (node  j = i->right; j != i; j = j->right) {
-            j->down->up = j->up;
-            j->up->down = j->down;
-            j->coln->size--;
-        }
+
+        node j = i->right;
+        node k = j->right;
+        node l = k->right;
+
+        j->down->up = j->up;
+        k->down->up = k->up;
+        l->down->up = l->up;
+
+        j->up->down = j->down;
+        k->up->down = k->down;
+        l->up->down = l->down;
+
+        --j->coln->size;
+        --k->coln->size;
+        --l->coln->size;
     }
 }
 
 
-void solve::uncover(node c) {
+inline void solve::uncover(node c) {
 
     for (node  i = c->up; i != c; i = i->up) {
-        for (node  j = i->left; j != i; j = j->left) {
-            j->coln->size++;
-            j->up->down = j;
-            j->down->up = j;
-        }
+
+        node j = i->left;
+        node k = j->left;
+        node l = k->left;
+
+        ++j->coln->size;
+        ++k->coln->size;
+        ++l->coln->size;
+
+        j->up->down = j;
+        k->up->down = k;
+        l->up->down = l;
+
+        j->down->up = j;
+        k->down->up = k;
+        l->down->up = l;
     }
 
     c->left->right = c;

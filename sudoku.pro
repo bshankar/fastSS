@@ -6,6 +6,7 @@ CONFIG -= qt
 QMAKE_CXXFLAGS += -std=c++11 \
     -march=native
 
+
 SOURCES += main.cpp \
     matrix.cpp \
     solve.cpp \
@@ -14,5 +15,6 @@ SOURCES += main.cpp \
 HEADERS += \
     matrix.h \
     solve.h \
-    generate.h
+    generate.h \
+    data.h
 

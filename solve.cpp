@@ -13,7 +13,6 @@ using std::ifstream;
 struct solve::solve_vars {
 
     us max_solns = 2;
-    bool quiet = false;
 
     // variables to parse the toroidal quadruply linked list
     node    root;
@@ -26,9 +25,6 @@ struct solve::solve_vars {
     // other variables
     ul      min_size;
     node    min_coln;
-    node    solution[INFTY];
-    char    solution_str[81]; // To be printed
-    us      solutions;
       // store the order in which colns are covered.
 };
 
@@ -182,16 +178,16 @@ inline void solve::uncover(node c) {
 
 void solve::search(ui k) {
 
-    if (sV->solutions >= sV->max_solns)
+    if (solutions >= sV->max_solns)
         return;
 
     if (sV->root->right == sV->root) {
-        ++sV->solutions;
-        if (!sV->quiet)
-            print_solution();
+        ++solutions;
+        print_solution();
 
-        if (sV->solutions >= sV->max_solns) {
-            cout << "Multiple solutions exist!" << endl;
+        if (solutions >= sV->max_solns) {
+            if (!quiet)
+                cout << "Multiple solutions exist!" << endl;
             return;
         }
         return;
@@ -202,7 +198,7 @@ void solve::search(ui k) {
     cover(c);
     for (node  r = c->down; r != c; r = r->down) {
         //O_k <--- r
-        sV->solution[k] = r;
+        solution[k] = r;
 
         for (node  j = r->right; j != r; j = j->right) {
             cover(j->coln);
@@ -210,7 +206,7 @@ void solve::search(ui k) {
 
         search(k+1);
         // r <--- O_k
-        r = sV->solution[k];
+        r = solution[k];
         c = r->coln;
         for (node  j = r->left; j != r; j = j->left) {
             uncover(j->coln);
@@ -223,19 +219,24 @@ void solve::search(ui k) {
 
 void solve::print_solution() {
 
-    for (us i = 0; sV->solution[i]; ++i) {
-        us r = sV->solution[i]->name;
+    for (us i = 0; solution[i]; ++i) {
+        us r = solution[i]->name;
         us cell = r/DIGITS;
         us digit = r%DIGITS + 1;
-        sV->solution_str[cell] = digit + 48;
+        solution_str[cell] = digit + 48;
     }
 
+    if (!quiet)
+        print_solution(solution_str);
+}
+
+void solve::print_solution(char *puzzle) {
 
     for (us i = 0; i < CELLS; ++i) {
         if (i % 3 == 0) {
             cout << "| ";
         }
-        cout << sV->solution_str[i] << " ";
+        cout << puzzle[i] << " ";
         if (i % 9 == 8) {
             cout << endl;
         }
@@ -245,7 +246,6 @@ void solve::print_solution() {
     }
     cout << endl << endl;
 }
-
 
 void solve::cover_colns(char *puzzle) {
 
@@ -266,7 +266,7 @@ void solve::cover_colns(char *puzzle) {
             cover(sV->coln_headers[c2]);
             cover(sV->coln_headers[c3]);
             cover(sV->coln_headers[c4]);
-            sV->solution_str[cell] = puzzle[cell];
+            solution_str[cell] = puzzle[cell];
 
             covered_colns[cc_index]   = c1;
             covered_colns[++cc_index] = c2;
@@ -284,7 +284,7 @@ void solve::restore_colns() {
         covered_colns[i] = 0;
     }
     cc_index = 0;
-    sV->solutions = 0;
+    solutions = 0;
 }
 
 
@@ -296,7 +296,7 @@ void solve::solve_puzzle(char *puzzle) {
 
 void solve::solve_puzzle(ifstream& puzzles, bool quiet) {
     char puzzle[CELLS];
-    sV->quiet = quiet;
+    quiet = quiet;
 
     if (puzzles.is_open()) {
         while (puzzles.good()) {

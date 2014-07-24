@@ -30,16 +30,22 @@ public:
     void uncover(node );
     void search(ui );
     void print_solution();
+    void print_solution(char* );
 
     // to solve a particular puzzle
     void cover_colns(char* );
     void restore_colns();
     void solve_puzzle(char* );
-    void solve_puzzle(std::ifstream& , bool quiet=true);
+    void solve_puzzle(std::ifstream& , bool quiet);
 
 protected:
+    bool quiet = false;
     us cc_index = 0;
     us covered_colns[COLNS] = {};
+    us solutions;
+
+    node    solution[INFTY];
+    char    solution_str[81]; // To be printed
 
 private:
     struct solve_vars;

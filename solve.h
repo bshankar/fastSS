@@ -6,6 +6,7 @@
 
 typedef unsigned short us;
 typedef unsigned int ui;
+typedef unsigned long ul;
 
 typedef struct link {
     link  *left;
@@ -28,18 +29,20 @@ public:
     void choose_coln();
     void cover(node );
     void uncover(node );
-    void search(ui );
+    void search(ul );
     void print_solution();
+    void pretty_print(char* );
     void print_solution(char* );
 
     // to solve a particular puzzle
     void cover_colns(char* );
     void restore_colns();
     void solve_puzzle(char* );
-    void solve_puzzle(std::ifstream& , bool quiet);
+    void solve_puzzle(std::ifstream& , bool quiet = true);
+
+    bool quiet = false;
 
 protected:
-    bool quiet = false;
     us cc_index = 0;
     us covered_colns[COLNS] = {};
     us solutions;

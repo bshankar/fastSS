@@ -1,6 +1,7 @@
 #include "solve.h"
 #include "matrix.h"
 #include <iostream>
+#include <ctime>
 
 typedef unsigned short  us;
 typedef unsigned int ui;
@@ -104,7 +105,7 @@ void solve::init_dlx() {
     }
 }
 
-inline void solve::choose_coln() {
+void solve::choose_coln() {
 
     // Minimize branching
     sV->min_coln = sV->root->right;
@@ -124,7 +125,7 @@ inline void solve::choose_coln() {
     }
 }
 
-inline void solve::cover(node c) {
+void solve::cover(node c) {
 
     c->left->right = c->right;
     c->right->left = c->left;
@@ -150,7 +151,7 @@ inline void solve::cover(node c) {
 }
 
 
-inline void solve::uncover(node c) {
+void solve::uncover(node c) {
 
     for (node  i = c->up; i != c; i = i->up) {
 
@@ -176,7 +177,7 @@ inline void solve::uncover(node c) {
 }
 
 
-void solve::search(ui k) {
+void solve::search(ul k) {
 
     if (solutions >= sV->max_solns)
         return;
@@ -230,7 +231,7 @@ void solve::print_solution() {
         print_solution(solution_str);
 }
 
-void solve::print_solution(char *puzzle) {
+void solve::pretty_print(char *puzzle) {
 
     for (us i = 0; i < CELLS; ++i) {
         if (i % 3 == 0) {
@@ -245,6 +246,13 @@ void solve::print_solution(char *puzzle) {
         }
     }
     cout << endl << endl;
+}
+
+void solve::print_solution(char *puzzle) {
+    for (us i = 0; i < CELLS; ++i) {
+        cout << puzzle[i];
+    }
+    cout << endl;
 }
 
 void solve::cover_colns(char *puzzle) {
@@ -295,8 +303,14 @@ void solve::solve_puzzle(char *puzzle) {
 
 
 void solve::solve_puzzle(ifstream& puzzles, bool quiet) {
+    this->quiet = quiet;
+    std::clock_t begin = std::clock();
     char puzzle[CELLS];
-    quiet = quiet;
+
+    ul no_of_puzzles = 0;
+    ul invalid_puzzles = 0;
+
+    cout << "Started solving puzzles ..." << endl;
 
     if (puzzles.is_open()) {
         while (puzzles.good()) {
@@ -304,7 +318,19 @@ void solve::solve_puzzle(ifstream& puzzles, bool quiet) {
             puzzles.ignore(64, '\n');
             cover_colns(puzzle);
             search(0);
+            if (solutions != 1)
+                ++invalid_puzzles;
+            ++no_of_puzzles;
+
+            if (no_of_puzzles % 5000 == 0)
+                cout << "Solved " << no_of_puzzles << " puzzles ..." << endl;
+
             restore_colns();
         }
     }
+    std::clock_t end = std::clock();
+    double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+    cout << "Solved " << no_of_puzzles << " sudoku puzzles in " << elapsed_secs << " sec " << endl;
+    cout << "Time taken per puzzle: " << elapsed_secs/no_of_puzzles << " sec " << endl;
+    cout << "Invalid puzzles: " << invalid_puzzles << endl << endl;
 }

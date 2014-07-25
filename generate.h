@@ -8,8 +8,8 @@ typedef unsigned long ul;
 class generate : public solve {
 
 public:
-    explicit generate(ul );
-    void generate_grid();
+    explicit generate(ul , us max_clues = 26);
+    bool generate_grid(us );
     void random_grid(); // Generate a random grid
 
 private:

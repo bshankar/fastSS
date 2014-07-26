@@ -216,6 +216,9 @@ void solve::search(ul k) {
     choose_coln();
     node c = sV->min_coln;
     cover(c);
+
+    branches += (sV->min_size - 1)*(sV->min_size - 1);
+
     for (node  r = c->down; r != c; r = r->down) {
         //O_k <--- r
         solution[k] = r;
@@ -247,32 +250,44 @@ void solve::print_solution() {
     }
 
     if (!quiet)
-        print_solution(solution_str);
+        pretty_print(solution_str, cc_index/4);
 }
 
-void solve::pretty_print(char *puzzle) {
+void solve::pretty_print(char *puzzle, us clues) {
+
+    cout << "╔═══╤═══╤═══╦═══╤═══╤═══╦═══╤═══╤═══╗" << endl;
 
     for (us i = 0; i < CELLS; ++i) {
         if (i % 3 == 0) {
-            cout << "| ";
+            cout << "║";
         }
-        cout << puzzle[i] << " ";
-        if (i % 9 == 8) {
-            cout << endl;
+        else
+            cout << "│";
+
+        if (puzzle[i] != '0')
+            cout << " " << puzzle[i] << " ";
+        else
+            cout << "   ";
+
+        if (i % 9 == 8 and !(i == 26 or i == 53 or i == 80)) {
+            cout << "║" << endl << "╟───┼───┼───╫───┼───┼───╫───┼───┼───╢" << endl;
         }
-        if (i == 26 or i == 53) {
-            cout << "-----------------------" << endl;
+        else if (i == 26 or i == 53) {
+            cout << "║" << endl << "╠═══╪═══╪═══╬═══╪═══╪═══╬═══╪═══╪═══╣" << endl;
         }
     }
-    cout << endl << endl;
+    cout << "║" << endl << "╚═══╧═══╧═══╩═══╧═══╧═══╩═══╧═══╧═══╝" << endl;
+    cout << "               #" << branches*100 + CELLS - clues << endl;
 }
+
 
 void solve::print_solution(char *puzzle) {
     for (us i = 0; i < CELLS; ++i) {
         cout << puzzle[i];
     }
-    cout << endl;
+    cout << "  #" << branches*100 + CELLS - cc_index/4 << endl;
 }
+
 
 void solve::cover_colns(char *puzzle) {
 
@@ -317,6 +332,7 @@ void solve::restore_colns() {
 
 void solve::solve_puzzle(char *puzzle) {
     cover_colns(puzzle);
+    branches = 0;
     search(0);
 }
 
@@ -337,6 +353,8 @@ void solve::solve_puzzle(ifstream& puzzles, bool quiet) {
             puzzles.ignore(64, '\n');
             cover_colns(puzzle);
             search(0);
+            branches = 0;
+
             if (solutions != 1)
                 ++invalid_puzzles;
             ++no_of_puzzles;

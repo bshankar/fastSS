@@ -43,8 +43,6 @@ void print_help() {
 
 int main(int argc, char **argv) {
 
-    srand(time(NULL));
-
     if (argc < 2 or argc > 4) {
         print_help();
     }
@@ -69,18 +67,13 @@ int main(int argc, char **argv) {
 
         else if (!strcmp(argv[1], "-g")){
             generate gen(atoi(argv[2]));
+            gen.generate_grids();
         }
         else
             print_help();
     }
 
-    else if (argc == 4 and (!strcmp(argv[1], "-g"))) {
-        if (atoi(argv[3]) < 17) {
-            cout << "A sudoku has minimum 17 clues!" << endl;
-            return 1;
-        }
-        generate gen(atoi(argv[2]), atoi(argv[3]));
-    }
     else
         print_help();
+
 }

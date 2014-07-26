@@ -4,17 +4,18 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 QMAKE_CXXFLAGS += -std=c++11 \
-    -march=native
+    -march=native \
+    -Wno-write-strings
 
 
-SOURCES += main.cpp \
-    matrix.cpp \
-    solve.cpp \
-    generate.cpp
+SOURCES += src/main.cpp \
+    src/matrix.cpp \
+    src/solve.cpp \
+    src/generate.cpp
 
 HEADERS += \
-    matrix.h \
-    solve.h \
-    generate.h \
-    data.h
+    src/matrix.h \
+    src/solve.h \
+    src/generate.h \
+    src/data.h
 

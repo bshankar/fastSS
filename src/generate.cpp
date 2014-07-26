@@ -22,6 +22,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 #include <random>
 #include <algorithm>
+#include <iterator>
 
 typedef unsigned short us;
 typedef unsigned int ui;
@@ -31,69 +32,107 @@ using std::cout;
 using std::endl;
 using std::vector;
 using std::to_string;
-using std::random_shuffle;
+using std::random_device;
+using std::mt19937;
+using std::shuffle;
+using std::uniform_int_distribution;
 
-generate::generate(ul n, us max_clues) {
+
+generate::generate(us n, bool use_pattern,
+                   us max_p_elim, us iter) {
 
     quiet = true;
-    ul puzzles_checked = 0;
-    cout << "Generating " << n << " puzzles with atmost "
-         << max_clues << " clues ..." << endl;
+
+    this->n = n;
+    this->use_pattern = use_pattern;
+    this->max_p_elim = max_p_elim;
+    this->iter = iter;
 
     for (us i = 0; i < CELLS; ++i)
         grid[i] = '0';
+}
+
+
+void generate::generate_grids() {
 
     ul puzzles_found = 0;
 
     while(puzzles_found < n) {
         random_grid();
+        generate_grid();
+        ++puzzles_found;
 
-        if(generate_grid(max_clues))
-            ++puzzles_found;
-
-        ++puzzles_checked;
         for (us i = 0; i < CELLS; ++i)
             grid[i] = '0';
 
         for (ul i = 0; i < INFTY; ++i)
             solution[i] = NULL;
     }
-    cout << "Finished generating " << n << " puzzles." << endl;
-    cout << "Total " << puzzles_checked << " puzzles were checked." << endl;
 }
 
 
-bool generate::generate_grid(us max_clues) {
+void generate::generate_grid() {
 
     // visit each cell in random order
     vector<us> cell_order(CELLS);
-    us clues = CELLS;
+    us clues = 0;
     int j = 0;
     for(vector<us>::iterator it = cell_order.begin() ; it != cell_order.end(); ++it){
             *it = j++;
-        }
-
-    random_shuffle(cell_order.begin(), cell_order.end());
-
-    for (int i = 0; i < CELLS; i++) {
-        char backup = grid[cell_order[i]];
-        grid[cell_order[i]] = '0';
-        --clues;
-        cover_colns(grid);
-        search(0);
-        if (solutions != 1) {
-            grid[cell_order[i]] = backup;
-            ++clues;
-        }
-        restore_colns();
     }
-    if (max_clues < clues)
-        return false;
 
+    random_device rd;
+    mt19937 g(rd());
+    shuffle(cell_order.begin(), cell_order.end(), g);
+
+    us pattern_elim = 0;
+    char pattern[CELLS] = {};
+
+    if (use_pattern) {
+        pattern_elim = max_p_elim;
+
+        uniform_int_distribution<int> distribution(0, hard_patterns.size() - 1);
+        us choice = distribution(rd);
+        for (us i = 0; i < CELLS; ++i)
+            pattern[i] = hard_patterns[choice][i];
+    }
+
+    ul max_branches = 0;
+    us best_clues = 0;
+    char best_puzzle[CELLS] = {};
+
+    for (ui iter_ = 0; iter_ < iter; ++iter_) {
+        for (int i = 0; i < CELLS; i++) {
+
+            if (use_pattern and pattern_elim and pattern[cell_order[i]] != '0')
+                continue;
+
+            else if (pattern_elim and pattern[cell_order[i]] == '1')
+                --pattern_elim;
+
+
+            char backup = grid[cell_order[i]];
+            grid[cell_order[i]] = '0';
+            cover_colns(grid);
+            clues = cc_index/4;
+            branches = 0;
+            search(0);
+
+            if ((max_branches < branches and solutions == 1) or !branches) {
+                for (us j = 0; j < CELLS; ++j) {
+                    best_puzzle[j] = grid[j];
+                    max_branches = branches;
+                    best_clues = clues;
+                }
+            }
+            if (solutions != 1)
+                grid[cell_order[i]] = backup;
+            restore_colns();
+        }
+    }
     quiet = false;
-    print_solution(grid);
+    pretty_print(best_puzzle, best_clues);
     quiet = true;
-    return true;
 }
 
 
@@ -106,7 +145,9 @@ void generate::random_grid() {
             *it = j++;
     }
 
-    random_shuffle(all_digits.begin(), all_digits.end());
+    random_device rd;
+    mt19937 g(rd());
+    shuffle(all_digits.begin(), all_digits.end(), g);
 
     us firstBox[]      = {0, 1, 2, 9, 10, 11, 18, 19, 20};
     us firstRowPart[]  = {3, 4, 5, 6, 7, 8};
@@ -132,5 +173,8 @@ void generate::random_grid() {
     for (ui i = 0; i < CELLS; ++i) {
         grid[i] = solution_str[i];
     }
+
     restore_colns();
+    branches = 0;
 }
+

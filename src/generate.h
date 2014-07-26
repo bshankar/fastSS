@@ -8,12 +8,21 @@ typedef unsigned long ul;
 class generate : public solve {
 
 public:
-    explicit generate(ul , us max_clues = 26);
-    bool generate_grid(us );
+    explicit generate(us n, bool use_pattern = true,
+                      us max_p_elim = 8, us iter = 5);
+
     void random_grid(); // Generate a random grid
+    void reduce();
+    void generate_grid();
+    void generate_grids();
 
 private:
     char grid[81] = {};
+    us n;
+    bool use_pattern;
+    us max_p_elim;
+    us iter;
+
 };
 
 #endif // GENERATE_H

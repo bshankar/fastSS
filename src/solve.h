@@ -50,7 +50,7 @@ public:
     void uncover(node );
     void search(ul );
     void print_solution();
-    void pretty_print(char* );
+    void pretty_print(char* , us );
     void print_solution(char* );
 
     // to solve a particular puzzle
@@ -63,8 +63,9 @@ public:
 
 protected:
     us cc_index = 0;
+    us solutions = 0;
+    ui branches = 0;
     us covered_colns[COLNS] = {};
-    us solutions;
 
     node    solution[INFTY];
     char    solution_str[81]; // To be printed

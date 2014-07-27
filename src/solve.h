@@ -44,6 +44,8 @@ class solve : public matrix{
 
 public:
     explicit solve();
+    ~solve();
+
     void init_dlx();
     void choose_coln();
     void cover(node );

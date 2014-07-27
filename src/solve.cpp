@@ -45,7 +45,6 @@ struct solve::solve_vars {
     // other variables
     ul      min_size;
     node    min_coln;
-      // store the order in which colns are covered.
 };
 
 solve::solve()
@@ -370,4 +369,21 @@ void solve::solve_puzzle(ifstream& puzzles, bool quiet) {
     cout << "Solved " << no_of_puzzles << " sudoku puzzles in " << elapsed_secs << " sec " << endl;
     cout << "Time taken per puzzle: " << elapsed_secs/no_of_puzzles << " sec " << endl;
     cout << "Invalid puzzles: " << invalid_puzzles << endl << endl;
+}
+
+
+solve::~solve() {
+    // delete the data structure
+    for (us i = 0; i < COLNS; ++i) {
+        node r = sV->coln_headers[i]->down;
+        node tmp = r->down;
+        while (r != sV->coln_headers[i]) {
+            delete r;
+            r = tmp;
+            tmp = tmp->down;
+        }
+        delete tmp;
+    }
+    delete sV->root;
+    delete sV;
 }

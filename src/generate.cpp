@@ -38,8 +38,7 @@ using std::shuffle;
 using std::uniform_int_distribution;
 
 
-generate::generate(us n, bool use_pattern,
-                   us max_p_elim, us iter) {
+generate::generate(us n) {
 
     quiet = true;
 
@@ -85,50 +84,28 @@ void generate::generate_grid() {
     mt19937 g(rd());
     shuffle(cell_order.begin(), cell_order.end(), g);
 
-    us pattern_elim = 0;
-    char pattern[CELLS] = {};
-
-    if (use_pattern) {
-        pattern_elim = max_p_elim;
-
-        uniform_int_distribution<int> distribution(0, hard_patterns.size() - 1);
-        us choice = distribution(rd);
-        for (us i = 0; i < CELLS; ++i)
-            pattern[i] = hard_patterns[choice][i];
-    }
-
     ul max_branches = 0;
     us best_clues = 0;
     char best_puzzle[CELLS] = {};
 
-    for (ui iter_ = 0; iter_ < iter; ++iter_) {
-        for (int i = 0; i < CELLS; i++) {
+    for (int i = 0; i < CELLS; i++) {
+        char backup = grid[cell_order[i]];
+        grid[cell_order[i]] = '0';
+        cover_colns(grid);
+        clues = cc_index/4;
+        branches = 0;
+        search(0);
 
-            if (use_pattern and pattern_elim and pattern[cell_order[i]] != '0')
-                continue;
-
-            else if (pattern_elim and pattern[cell_order[i]] == '1')
-                --pattern_elim;
-
-
-            char backup = grid[cell_order[i]];
-            grid[cell_order[i]] = '0';
-            cover_colns(grid);
-            clues = cc_index/4;
-            branches = 0;
-            search(0);
-
-            if ((max_branches < branches and solutions == 1) or !branches) {
-                for (us j = 0; j < CELLS; ++j) {
-                    best_puzzle[j] = grid[j];
-                    max_branches = branches;
-                    best_clues = clues;
-                }
+        if ((max_branches < branches and solutions == 1) or !branches) {
+            for (us j = 0; j < CELLS; ++j) {
+                best_puzzle[j] = grid[j];
+                max_branches = branches;
+                best_clues = clues;
             }
-            if (solutions != 1)
-                grid[cell_order[i]] = backup;
-            restore_colns();
         }
+        if (solutions != 1)
+            grid[cell_order[i]] = backup;
+        restore_colns();
     }
     quiet = false;
     pretty_print(best_puzzle, best_clues);

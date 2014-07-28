@@ -316,7 +316,7 @@ void solve::cover_colns(char *puzzle) {
             cc_index += 1;
         }
     }
-    branches = 0
+    branches = 0;
 }
 
 

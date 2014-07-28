@@ -197,18 +197,12 @@ void solve::uncover(node c) {
 
 void solve::search(ul k) {
 
-    if (solutions >= sV->max_solns)
+    if (sV->max_solns <= solutions)
         return;
 
     if (sV->root->right == sV->root) {
         ++solutions;
         print_solution();
-
-        if (solutions >= sV->max_solns) {
-            if (!quiet)
-                cout << "Multiple solutions exist!" << endl;
-            return;
-        }
         return;
     }
 
@@ -222,17 +216,16 @@ void solve::search(ul k) {
         //O_k <--- r
         solution[k] = r;
 
-        for (node  j = r->right; j != r; j = j->right) {
-            cover(j->coln);
-        }
+        node j_ = r->right; node k_ = j_->right; node l_ = k_->right;
+        cover(j_->coln); cover(k_->coln); cover(l_->coln);
 
         search(k+1);
         // r <--- O_k
         r = solution[k];
         c = r->coln;
-        for (node  j = r->left; j != r; j = j->left) {
-            uncover(j->coln);
-        }
+
+        j_ = r->left; k_ = j_->left; l_ = k_->left;
+        uncover(j_->coln); uncover(k_->coln); uncover(l_->coln);
     }
     uncover(c);
     return;

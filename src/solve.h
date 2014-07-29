@@ -60,7 +60,8 @@ public:
     void cover_colns(char* );
     void restore_colns();
     void solve_puzzle(char* );
-    void solve_puzzle(std::ifstream& , bool quiet = true);
+    void solve_puzzle(std::ifstream& , bool quiet = true,
+                      bool warn_multiple = true);
 
     bool quiet = false;
 

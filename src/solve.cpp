@@ -331,7 +331,7 @@ void solve::solve_puzzle(char *puzzle) {
 }
 
 
-void solve::solve_puzzle(ifstream& puzzles, bool quiet) {
+void solve::solve_puzzle(ifstream& puzzles, bool quiet, bool warn_multiple) {
     this->quiet = quiet;
     std::clock_t begin = std::clock();
     char puzzle[CELLS];
@@ -346,6 +346,8 @@ void solve::solve_puzzle(ifstream& puzzles, bool quiet) {
             puzzles >> puzzle;
             puzzles.ignore(64, '\n');
             cover_colns(puzzle);
+            if (!warn_multiple)
+                sV->max_solns = 1;
             search(0);
             branches = 0;
 
@@ -363,7 +365,10 @@ void solve::solve_puzzle(ifstream& puzzles, bool quiet) {
     double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
     cout << "Solved " << no_of_puzzles << " sudoku puzzles in " << elapsed_secs << " sec " << endl;
     cout << "Time taken per puzzle: " << elapsed_secs/no_of_puzzles << " sec " << endl;
-    cout << "Invalid puzzles: " << invalid_puzzles << endl << endl;
+    if (!warn_multiple)
+        cout << "Uniqueness check was off. Some puzzles may have multiple solutions!" << endl;
+    else
+        cout << "Invalid puzzles: " << invalid_puzzles << endl << endl;
 }
 
 

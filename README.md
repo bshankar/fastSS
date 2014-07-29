@@ -37,6 +37,10 @@ To solve puzzles without any output,
 
     $ ./fastSS -fq <file>
     
+To skip checking for uniqueness of solution and not give any output,
+
+    $ ./fastSS -fqa <file>
+    
 To generate 'n' puzzles,
 
     $ ./fastSS -g <number>

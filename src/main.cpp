@@ -37,6 +37,8 @@ void print_help() {
     cout << "$ ./sudoku -f <file>" << endl;
     cout << "Fast solve a text file(benchmark): " << endl;
     cout << "$ ./sudoku -fq <file>" << endl;
+    cout << "Fast solve a text file(assume unique solution): " << endl;
+    cout << "$ ./sudoku -fqa <file>" << endl;
     cout << "print this help: " << endl;
     cout << "$ ./sudoku -h" << endl << endl;
 }
@@ -65,6 +67,12 @@ int main(int argc, char **argv) {
             sol.solve_puzzle(file);
         }
 
+        else if (!strcmp(argv[1], "-fqa")){
+            solve sol;
+            ifstream file(argv[2]);
+            sol.solve_puzzle(file, true, false);
+        }
+
         else if (!strcmp(argv[1], "-g")){
             generate gen(atoi(argv[2]));
             gen.generate_grids();
@@ -75,5 +83,4 @@ int main(int argc, char **argv) {
 
     else
         print_help();
-
 }

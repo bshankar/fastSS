@@ -123,7 +123,7 @@ void solve::init_dlx() {
     }
 }
 
-void solve::choose_coln() {
+inline void solve::choose_coln() {
 
     // Minimize branching
     sV->min_coln = sV->root->right;
@@ -143,7 +143,7 @@ void solve::choose_coln() {
     }
 }
 
-void solve::cover(node c) {
+inline void solve::cover(node c) {
 
     c->left->right = c->right;
     c->right->left = c->left;
@@ -169,7 +169,7 @@ void solve::cover(node c) {
 }
 
 
-void solve::uncover(node c) {
+inline void solve::uncover(node c) {
 
     for (node  i = c->up; i != c; i = i->up) {
 

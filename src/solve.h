@@ -33,6 +33,7 @@ typedef struct link {
     link  *up;
     link  *down;
     link  *coln;
+    link  *out;
 
     us name;
     us size;
@@ -52,7 +53,7 @@ public:
     void uncover(node );
     void search(ul );
     void print_solution();
-    void pretty_print(char* , us );
+    void pretty_print(char* );
     void print_solution(char* );
 
     // to solve a particular puzzle
@@ -64,7 +65,6 @@ public:
     bool quiet = false;
 
 protected:
-    us cc_index = 0;
     us solutions = 0;
     ui branches = 0;
     us covered_colns[COLNS] = {};

@@ -74,7 +74,6 @@ void generate::generate_grid() {
 
     // visit each cell in random order
     vector<us> cell_order(CELLS);
-    us clues = 0;
     int j = 0;
     for(vector<us>::iterator it = cell_order.begin() ; it != cell_order.end(); ++it){
             *it = j++;
@@ -85,14 +84,12 @@ void generate::generate_grid() {
     shuffle(cell_order.begin(), cell_order.end(), g);
 
     ul max_branches = 0;
-    us best_clues = 0;
     char best_puzzle[CELLS] = {};
 
     for (int i = 0; i < CELLS; i++) {
         char backup = grid[cell_order[i]];
         grid[cell_order[i]] = '0';
         cover_colns(grid);
-        clues = cc_index/4;
         branches = 0;
         search(0);
 
@@ -100,7 +97,6 @@ void generate::generate_grid() {
             for (us j = 0; j < CELLS; ++j) {
                 best_puzzle[j] = grid[j];
                 max_branches = branches;
-                best_clues = clues;
             }
         }
         if (solutions != 1)
@@ -108,7 +104,7 @@ void generate::generate_grid() {
         restore_colns();
     }
     quiet = false;
-    pretty_print(best_puzzle, best_clues);
+    pretty_print(best_puzzle);
     quiet = true;
 }
 

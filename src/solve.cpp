@@ -242,10 +242,10 @@ void solve::print_solution() {
     }
 
     if (!quiet)
-        pretty_print(solution_str, cc_index/4);
+        pretty_print(solution_str);
 }
 
-void solve::pretty_print(char *puzzle, us clues) {
+void solve::pretty_print(char *puzzle) {
 
     cout << "╔═══╤═══╤═══╦═══╤═══╤═══╦═══╤═══╤═══╗" << endl;
 
@@ -269,7 +269,7 @@ void solve::pretty_print(char *puzzle, us clues) {
         }
     }
     cout << "║" << endl << "╚═══╧═══╧═══╩═══╧═══╧═══╩═══╧═══╧═══╝" << endl;
-    cout << "               #" << branches*100 + CELLS - clues << endl;
+    cout << "               #" << branches*100 << endl;
 }
 
 
@@ -277,13 +277,13 @@ void solve::print_solution(char *puzzle) {
     for (us i = 0; i < CELLS; ++i) {
         cout << puzzle[i];
     }
-    cout << "  #" << branches*100 + CELLS - cc_index/4 << endl;
+    cout << "  #" << branches*100 << endl;
 }
 
 
 void solve::cover_colns(char *puzzle) {
 
-    cc_index = 0;
+    node tmp = sV->root->out; // immediately linked to root
 
     for (us cell = 0; cell < CELLS; ++cell) {
 
@@ -296,17 +296,24 @@ void solve::cover_colns(char *puzzle) {
             us c3 = cell%DIGITS*DIGITS + 2*CELLS + d;
             us c4 = (cell/N - cell/DIGITS*N + cell/(N*DIGITS)*N)*DIGITS + 3*CELLS + d;
 
-            cover(sV->coln_headers[c1]);
-            cover(sV->coln_headers[c2]);
-            cover(sV->coln_headers[c3]);
-            cover(sV->coln_headers[c4]);
+            node C1 = sV->coln_headers[c1]; node C2 = sV->coln_headers[c2];
+            node C3 = sV->coln_headers[c3]; node C4 = sV->coln_headers[c4];
+
+            cover(C1);  cover(C2);
+            cover(C3);  cover(C4);
+
             solution_str[cell] = puzzle[cell];
 
-            covered_colns[cc_index]   = c1;
-            covered_colns[++cc_index] = c2;
-            covered_colns[++cc_index] = c3;
-            covered_colns[++cc_index] = c4;
-            cc_index += 1;
+            sV->root->out = C4;
+            C4->out = C3; C3->out = C2;
+            C2->out = C1; C1->out = tmp;
+            tmp = C4;
+
+            //covered_colns[cc_index]   = c1;
+            //covered_colns[++cc_index] = c2;
+            //covered_colns[++cc_index] = c3;
+            //covered_colns[++cc_index] = c4;
+            //cc_index += 1;
         }
     }
     branches = 0;
@@ -314,12 +321,18 @@ void solve::cover_colns(char *puzzle) {
 
 
 void solve::restore_colns() {
-    for (int i = cc_index - 1; i >= 0; --i) {
-        uncover(sV->coln_headers[covered_colns[i]]);
-        covered_colns[i] = 0;
-    }
-    cc_index = 0;
+
+//    for (int i = cc_index - 1; i >= 0; --i) {
+//        uncover(sV->coln_headers[covered_colns[i]]);
+//        covered_colns[i] = 0;
+//    }
+//    cc_index = 0;
+
+    for (node c = sV->root->out; c; c = c->out)
+        uncover(c);
+
     solutions = 0;
+    sV->root->out = NULL;
 }
 
 

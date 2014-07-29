@@ -1,4 +1,5 @@
-*.pro.user
+*.pro.user*
 *.o
 Makefile
 fastSS
+*.txt

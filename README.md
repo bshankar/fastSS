@@ -12,8 +12,8 @@ Speed
 various difficulty levels. top50000.txt contains
 ontains 50000 very difficult puzzles.
 
-fastSS takes 2.9s to solve 55100.txt i.e **@19000 puzzles/s**
-     and 3.7s to solve top50000.txt i.e  **@13514 puzzles/s** on a 2.6Ghz CPU.
+fastSS takes 2.62s to solve 55100.txt i.e **@21030 puzzles/s**
+     and 3.49s to solve top50000.txt i.e   **@14326 puzzles/s** on a 2.6Ghz intel i7 CPU.
 
 
 Compiling

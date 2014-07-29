@@ -284,7 +284,6 @@ void solve::print_solution(char *puzzle) {
 void solve::cover_colns(char *puzzle) {
 
     node tmp = sV->root->out; // immediately linked to root
-
     for (us cell = 0; cell < CELLS; ++cell) {
 
         if (puzzle[cell] != '0') {
@@ -308,12 +307,6 @@ void solve::cover_colns(char *puzzle) {
             C4->out = C3; C3->out = C2;
             C2->out = C1; C1->out = tmp;
             tmp = C4;
-
-            //covered_colns[cc_index]   = c1;
-            //covered_colns[++cc_index] = c2;
-            //covered_colns[++cc_index] = c3;
-            //covered_colns[++cc_index] = c4;
-            //cc_index += 1;
         }
     }
     branches = 0;
@@ -321,12 +314,6 @@ void solve::cover_colns(char *puzzle) {
 
 
 void solve::restore_colns() {
-
-//    for (int i = cc_index - 1; i >= 0; --i) {
-//        uncover(sV->coln_headers[covered_colns[i]]);
-//        covered_colns[i] = 0;
-//    }
-//    cc_index = 0;
 
     for (node c = sV->root->out; c; c = c->out)
         uncover(c);

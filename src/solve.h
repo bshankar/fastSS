@@ -67,7 +67,6 @@ public:
 protected:
     us solutions = 0;
     ui branches = 0;
-    us covered_colns[COLNS] = {};
 
     node    solution[INFTY];
     char    solution_str[81]; // To be printed

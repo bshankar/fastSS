@@ -4,7 +4,6 @@ fastSS
 A simple and fast sudoku solver and generator written in C++ based on the dancing 
 links algorithm.
 
-
 Speed
 =====
 
@@ -15,6 +14,8 @@ ontains 50000 very difficult puzzles.
 fastSS takes 2.62s to solve 55100.txt i.e **@21030 puzzles/s**
      and 3.49s to solve top50000.txt i.e   **@14326 puzzles/s** on a 2.6Ghz intel i7 CPU.
 
+Without uniqueness checking on the same CPU, fastSS can solve 55100.txt 
+in 2.34s and top50000.txt in 2.75s. 
 
 Compiling
 =========

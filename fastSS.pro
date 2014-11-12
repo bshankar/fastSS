@@ -3,9 +3,13 @@ CONFIG += console
 CONFIG -= app_bundle
 CONFIG -= qt
 
-QMAKE_CXXFLAGS += -std=c++11 \
-    -march=native \
-    -Wno-write-strings
+QMAKE_CFLAGS_DEBUG = -std=c++11 -O0 -g
+QMAKE_CFLAGS_RELEASE = -std=c++11 -O3 \
+    -march=native -Wall -DNDEBUG
+
+QMAKE_CXXFLAGS_DEBUG = -std=c++11 -O0 -g
+QMAKE_CXXFLAGS_RELEASE = -std=c++11 -O3 \
+    -march=native -Wall -DNDEBUG
 
 
 SOURCES += src/main.cpp \

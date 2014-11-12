@@ -67,14 +67,23 @@ public:
 
 protected:
     us solutions = 0;
-    ui branches = 0;
-
     node    solution[INFTY];
     char    solution_str[81]; // To be printed
 
 private:
-    struct solve_vars;
-    solve_vars *sV;
+    us max_solns = 2;
+
+    // variables to parse the toroidal quadruply linked list
+    node    root;
+    node    this_head;
+    node    tmp_head;
+    node    tmp_row;
+
+    node    coln_headers[COLNS];
+
+    // other variables
+    ul      min_size;
+    node    min_coln;
 
 
 };

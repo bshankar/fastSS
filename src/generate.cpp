@@ -82,21 +82,17 @@ void generate::generate_grid() {
     random_device rd;
     mt19937 g(rd());
     shuffle(cell_order.begin(), cell_order.end(), g);
-
-    ul max_branches = 0;
     char best_puzzle[CELLS] = {};
 
     for (int i = 0; i < CELLS; i++) {
         char backup = grid[cell_order[i]];
         grid[cell_order[i]] = '0';
         cover_colns(grid);
-        branches = 0;
         search(0);
 
-        if ((max_branches < branches and solutions == 1) or !branches) {
+        if (solutions == 1) {
             for (us j = 0; j < CELLS; ++j) {
                 best_puzzle[j] = grid[j];
-                max_branches = branches;
             }
         }
         if (solutions != 1)
@@ -148,6 +144,5 @@ void generate::random_grid() {
     }
 
     restore_colns();
-    branches = 0;
 }
 

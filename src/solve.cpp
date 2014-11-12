@@ -30,52 +30,34 @@ using std::cout;
 using std::endl;
 using std::ifstream;
 
-struct solve::solve_vars {
-
-    us max_solns = 2;
-
-    // variables to parse the toroidal quadruply linked list
-    node    root;
-    node    this_head;
-    node    tmp_head;
-    node    tmp_row;
-
-    node    coln_headers[COLNS];
-
-    // other variables
-    ul      min_size;
-    node    min_coln;
-};
-
-solve::solve()
-    : sV(new solve_vars()) {
+solve::solve() {
     init_dlx();
 }
 
 
 void solve::init_dlx() {
-    sV->root      = new link();
-    sV->this_head = new link();
+    root      = new link();
+    this_head = new link();
 
-    sV->root->right = sV->this_head;
-    sV->this_head->left = sV->root;
-    sV->this_head->name = 0;
-    sV->this_head->size = DIGITS;
-    sV->coln_headers[0] = sV->this_head;
+    root->right = this_head;
+    this_head->left = root;
+    this_head->name = 0;
+    this_head->size = DIGITS;
+    coln_headers[0] = this_head;
 
     // create and link all column headers
     for (us i = 1; i < COLNS; ++i) {
-        sV->tmp_head = new link();
-        sV->tmp_head->name = i;
-        sV->tmp_head->size = DIGITS;
-        sV->this_head->right = sV->tmp_head;
-        sV->tmp_head->left = sV->this_head;
-        sV->this_head = sV->tmp_head;
-        sV->coln_headers[i] = sV->this_head;
+        tmp_head = new link();
+        tmp_head->name = i;
+        tmp_head->size = DIGITS;
+        this_head->right = tmp_head;
+        tmp_head->left = this_head;
+        this_head = tmp_head;
+        coln_headers[i] = this_head;
     }
 
-    sV->coln_headers[COLNS-1]->right = sV->root;
-    sV->root->left = sV->coln_headers[COLNS-1];
+    coln_headers[COLNS-1]->right = root;
+    root->left = coln_headers[COLNS-1];
 
     // store immediately above and left
     node above[COLNS] = {};
@@ -84,35 +66,35 @@ void solve::init_dlx() {
     for (us i = 0; i < ROWS; ++i) {
         for (us j = 0; j < COLNS; ++j) {
             if (m[i][j]) {
-                sV->tmp_row = new link();
-                sV->tmp_row->name = i;
-                sV->tmp_row->coln = sV->coln_headers[j];
+                tmp_row = new link();
+                tmp_row->name = i;
+                tmp_row->coln = coln_headers[j];
 
                 // vertical links
                 if (above[j] == NULL) {
-                    sV->coln_headers[j]->down = sV->tmp_row;
-                    sV->tmp_row->up = sV->coln_headers[j];
+                    coln_headers[j]->down = tmp_row;
+                    tmp_row->up = coln_headers[j];
                 }
                 else {
-                    above[j]->down = sV->tmp_row;
-                    sV->tmp_row->up = above[j];
+                    above[j]->down = tmp_row;
+                    tmp_row->up = above[j];
                 }
-                above[j] = sV->tmp_row;
+                above[j] = tmp_row;
 
                 // horizontal links
                 if (before[i] != NULL) {
-                    before[i]->right = sV->tmp_row;
-                    sV->tmp_row->left = before[i];
+                    before[i]->right = tmp_row;
+                    tmp_row->left = before[i];
                 }
-                before[i] = sV->tmp_row;
+                before[i] = tmp_row;
             }
         }
     }
 
     // make colns circular
     for (us i = 0; i < COLNS; ++i) {
-        sV->coln_headers[i]->up = above[i];
-        above[i]->down = sV->coln_headers[i];
+        coln_headers[i]->up = above[i];
+        above[i]->down = coln_headers[i];
     }
 
     // make rows circular
@@ -126,19 +108,19 @@ void solve::init_dlx() {
 inline void solve::choose_coln() {
 
     // Minimize branching
-    sV->min_coln = sV->root->right;
-    sV->min_size = sV->root->right->size;
-    for (node cH = sV->root->right; cH != sV->root; cH = cH->right) {
+    min_coln = root->right;
+    min_size = root->right->size;
+    for (node cH = root->right; cH != root; cH = cH->right) {
 
         if (cH->size == 1) {
-            sV->min_size = 1;
-            sV->min_coln = cH;
+            min_size = 1;
+            min_coln = cH;
             break;
         }
 
-        if (cH->size < sV->min_size) {
-            sV->min_coln = cH;
-            sV->min_size = cH->size;
+        if (cH->size < min_size) {
+            min_coln = cH;
+            min_size = cH->size;
         }
     }
 }
@@ -197,20 +179,18 @@ inline void solve::uncover(node c) {
 
 void solve::search(ul k) {
 
-    if (sV->max_solns <= solutions)
+    if (max_solns <= solutions)
         return;
 
-    if (sV->root->right == sV->root) {
+    if (root->right == root) {
         ++solutions;
         print_solution();
         return;
     }
 
     choose_coln();
-    node c = sV->min_coln;
+    node c = min_coln;
     cover(c);
-
-    branches += (sV->min_size - 1)*(sV->min_size - 1);
 
     for (node  r = c->down; r != c; r = r->down) {
         //O_k <--- r
@@ -269,7 +249,6 @@ void solve::pretty_print(char *puzzle) {
         }
     }
     cout << "║" << endl << "╚═══╧═══╧═══╩═══╧═══╧═══╩═══╧═══╧═══╝" << endl;
-    cout << "               #" << branches*100 << endl;
 }
 
 
@@ -277,13 +256,12 @@ void solve::print_solution(char *puzzle) {
     for (us i = 0; i < CELLS; ++i) {
         cout << puzzle[i];
     }
-    cout << "  #" << branches*100 << endl;
 }
 
 
 void solve::cover_colns(char *puzzle) {
 
-    node tmp = sV->root->out; // immediately linked to root
+    node tmp = root->out; // immediately linked to root
     for (us cell = 0; cell < CELLS; ++cell) {
 
         if (puzzle[cell] != '0') {
@@ -295,37 +273,35 @@ void solve::cover_colns(char *puzzle) {
             us c3 = cell%DIGITS*DIGITS + 2*CELLS + d;
             us c4 = (cell/N - cell/DIGITS*N + cell/(N*DIGITS)*N)*DIGITS + 3*CELLS + d;
 
-            node C1 = sV->coln_headers[c1]; node C2 = sV->coln_headers[c2];
-            node C3 = sV->coln_headers[c3]; node C4 = sV->coln_headers[c4];
+            node C1 = coln_headers[c1]; node C2 = coln_headers[c2];
+            node C3 = coln_headers[c3]; node C4 = coln_headers[c4];
 
             cover(C1);  cover(C2);
             cover(C3);  cover(C4);
 
             solution_str[cell] = puzzle[cell];
 
-            sV->root->out = C4;
+            root->out = C4;
             C4->out = C3; C3->out = C2;
             C2->out = C1; C1->out = tmp;
             tmp = C4;
         }
     }
-    branches = 0;
 }
 
 
 void solve::restore_colns() {
 
-    for (node c = sV->root->out; c; c = c->out)
+    for (node c = root->out; c; c = c->out)
         uncover(c);
 
     solutions = 0;
-    sV->root->out = NULL;
+    root->out = NULL;
 }
 
 
 void solve::solve_puzzle(char *puzzle) {
     cover_colns(puzzle);
-    branches = 0;
     search(0);
     restore_colns();
 }
@@ -347,9 +323,8 @@ void solve::solve_puzzle(ifstream& puzzles, bool quiet, bool warn_multiple) {
             puzzles.ignore(64, '\n');
             cover_colns(puzzle);
             if (!warn_multiple)
-                sV->max_solns = 1;
+                max_solns = 1;
             search(0);
-            branches = 0;
 
             if (solutions != 1)
                 ++invalid_puzzles;
@@ -375,15 +350,14 @@ void solve::solve_puzzle(ifstream& puzzles, bool quiet, bool warn_multiple) {
 solve::~solve() {
     // delete the data structure
     for (us i = 0; i < COLNS; ++i) {
-        node r = sV->coln_headers[i]->down;
+        node r = coln_headers[i]->down;
         node tmp = r->down;
-        while (r != sV->coln_headers[i]) {
+        while (r != coln_headers[i]) {
             delete r;
             r = tmp;
             tmp = tmp->down;
         }
         delete tmp;
     }
-    delete sV->root;
-    delete sV;
+    delete root;
 }

@@ -2,7 +2,7 @@ fastSS
 ======
 
 A simple and fast sudoku solver and generator written in C++ based on the dancing
-links algorithm.
+links algorithm. Now [reimplemented](https://github.com/bshankar/qss) in rust with improvements.
 
 Speed
 =====
